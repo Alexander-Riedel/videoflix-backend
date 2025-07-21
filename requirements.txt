@@ -8,6 +8,7 @@ django-rq==3.0.1
 djangorestframework==3.16.0
 gunicorn==23.0.0
 packaging==25.0
+pillow==11.3.0
 psycopg2-binary==2.9.10
 python-dotenv==1.1.1
 redis==6.2.0

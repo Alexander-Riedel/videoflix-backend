@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_rq',
+    'video_app.apps.VideoAppConfig',
+    'auth_app',
 ]
 
 MIDDLEWARE = [
@@ -169,3 +171,18 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# DRF settings
+
+REST_FRAMEWORK = {
+    # Standard-Renderer: HTML + JSON
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    # Optional: Standard-Permission (hier offen für alle)
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}

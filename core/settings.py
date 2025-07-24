@@ -51,9 +51,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'django_rq',
     'video_app.apps.VideoAppConfig',
     'auth_app',
+    'django_rq',
 ]
 
 MIDDLEWARE = [

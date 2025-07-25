@@ -1,22 +1,22 @@
-# import subprocess
 import ffmpeg
 
-
-# def convert_480p(source):
-#     target = source + '_480p.mp4'
-#     cmd = 'ffmpeg -i "{}" -s hd480 -c:v libx264 -crf 23 -c:a aac -strict -2 "{}"'.format(source, target)
-#     subprocess.run(cmd)
-
-def convert_480p(source):
-    target = source.replace('.mp4', '_480p.mp4')
+def convert_to_hls(source: str):
+    """
+    Erzeugt aus source.mp4 eine HLS-Playlist source.m3u8
+    mit copy-Codec und 10-Sekunden-Segmenten.
+    """
+    target = source.replace('.mp4', '.m3u8')
     (
         ffmpeg
         .input(source)
-        .filter('scale', 854, 480)       # HD-480 ist 854×480
-        .output(target,
-                vcodec='libx264',
-                crf=23,
-                acodec='aac',
-                strict='-2')
-        .run(overwrite_output=True)      # überschreibt ggf. existierende Ziel-Datei
+        .output(
+            target,
+            vcodec='copy',        # kein Re-Encoding Video
+            acodec='copy',        # kein Re-Encoding Audio
+            start_number=0,       # erste Segment-Nummer
+            hls_time=10,          # Länge jedes Segments in Sekunden
+            hls_list_size=0,      # alle Segmente in Playlist
+            f='hls'               # Format HLS
+        )
+        .run(overwrite_output=True)
     )

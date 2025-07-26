@@ -8,10 +8,11 @@ from django.contrib.auth.tokens import default_token_generator
 
 class RegisterSerializer(serializers.ModelSerializer):
     confirmed_password = serializers.CharField(write_only=True)
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'confirmed_password')
+        fields = ('id', 'email', 'password', 'confirmed_password')
         extra_kwargs = {
             'password': {'write_only': True}
         }

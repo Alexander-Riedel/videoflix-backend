@@ -32,11 +32,21 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-@#x5h3zj!g+8g1v@2^
 DEBUG = True
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", default="localhost").split(",")
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", default="http://localhost:4200").split(",")
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:4200', 
+    'http://127.0.0.1:4200', 
+    'http://localhost:5500', 
+    'http://127.0.0.1:5500',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:4200', 
+    'http://127.0.0.1:4200', 
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
@@ -186,3 +196,16 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+
+# Mail settings
+
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'False') == 'True'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+
+EMAIL_BACKEND = "auth_app.api.email_backend.UnverifiedTLSBackend"

@@ -141,18 +141,26 @@ class CookieTokenRefreshView(TokenRefreshView):
         if not refresh_token:
             return Response({'detail': 'Refresh token missing.'}, status=400)
 
-        request.data._mutable = True
-        request.data['refresh'] = refresh_token
-        request.data._mutable = False
+        serializer = self.get_serializer(data={"refresh": refresh_token})
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            return Response({'detail': str(e)}, status=401)
 
-        response = super().post(request, *args, **kwargs)
+        access_token = serializer.validated_data.get('access')
+        response = Response({
+            'detail': 'Token refreshed',
+            'access': access_token
+        })
 
-        if response.status_code == 200 and 'access' in response.data:
-            response.set_cookie('access_token', response.data['access'], httponly=True)
-            response.data = {
-                'detail': 'Token refreshed',
-                'access': response.data['access']
-            }
+        if access_token:
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                httponly=True,
+                secure=False,
+                samesite='Lax'
+            )
 
         return response
 

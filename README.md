@@ -51,23 +51,23 @@ Use these tokens for all further requests automatically. No manual headers neede
 
 ---
 
-## ⚙️ Project Setup (Docker)
+## ⚙️ Project Setup
 
 This project uses Docker and docker-compose for easy setup. The default web service is named **web**.
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourorg/videoflix-backend.git
+git clone https://github.com/Alexander-Riedel/videoflix-backend.git
 cd videoflix-backend
 ```
 
 ### 2. Copy and configure environment variables
 
-Create a `.env` file in the project root, based on `.env.example`:
+Create a `.env` file in the project root, based on `.env.template`:
 
 ```bash
-cp .env.example .env
+cp .env.template .env
 ```
 
 Edit `.env` and fill in your values (e.g. database credentials, EMAIL_HOST, SECRET_KEY, FRONTEND_URL, etc.).
@@ -85,25 +85,8 @@ This will:
 3. Start the **db** (PostgreSQL) service  
 4. Start the **redis** service for caching and RQ  
 
-### 4. Apply database migrations
+### 4. Access the application
 
-In a new terminal, run:
-
-```bash
-docker-compose exec web python manage.py migrate
-```
-
-### 5. (Optional) Create a superuser
-
-```bash
-docker-compose exec web python manage.py createsuperuser
-```
-
-Follow the prompts to set email and password.
-
-### 6. Access the application
-
-- **API**: http://localhost:8000/api/  
 - **Admin**: http://localhost:8000/admin/  
 
 Stop the services with **CTRL+C** in the `docker-compose` terminal, or:
@@ -112,21 +95,25 @@ Stop the services with **CTRL+C** in the `docker-compose` terminal, or:
 docker-compose down
 ```
 
+### Need help?
+
+Please visit: https://github.com/Developer-Akademie-Backendkurs/material.videoflix-docker-files
+
 ---
 
 ## 📚 Endpoints
 
-| Endpoint                                                  | Method | Description                          |
-| --------------------------------------------------------- | ------ | ------------------------------------ |
-| `/api/register/`                                          | POST   | Register new user                    |
-| `/api/activate/<uidb64>/<token>/`                         | GET    | Activate new user                    |
-| `/api/login/`                                             | POST   | Log in (returns JWT in cookies)      |
-| `/api/logout/`                                            | POST   | Logout and clear cookies             |
-| `/api/token/refresh/`                                     | POST   | Refresh access token via cookie      |
-| `/api/password_reset/`                                    | POST   | Send password reset mail             |
-| `/api/password_confirm/<uidb64>/<token>/`                 | POST   | Confirm new password                 |
-| `/api/video/`                                             | GET    | List all available videos            |
-| `/api/video/<int:movie_id>/<str:resolution>/index.m3u8`   | GET    | Fetch master playlist for streaming  |
+| Endpoint                                                      | Method | Description                          |
+| ------------------------------------------------------------- | ------ | ------------------------------------ |
+| `/api/register/`                                              | POST   | Register new user                    |
+| `/api/activate/<uidb64>/<token>/`                             | GET    | Activate new user                    |
+| `/api/login/`                                                 | POST   | Log in (returns JWT in cookies)      |
+| `/api/logout/`                                                | POST   | Logout and clear cookies             |
+| `/api/token/refresh/`                                         | POST   | Refresh access token via cookie      |
+| `/api/password_reset/`                                        | POST   | Send password reset mail             |
+| `/api/password_confirm/<uidb64>/<token>/`                     | POST   | Confirm new password                 |
+| `/api/video/`                                                 | GET    | List all available videos            |
+| `/api/video/<int:movie_id>/<str:resolution>/index.m3u8`       | GET    | Fetch master playlist for streaming  |
 | `/api/video/<int:movie_id>/<str:resolution>/<str:segment>/`   | GET    | Fetch video segment for HLS playback |
 
 ---
@@ -141,28 +128,23 @@ Tests are implemented using **pytest** with a separate `settings_test.py` and an
 pytest
 ```
 
-### Sample tested features:
-
-* Video listing
-* Manifest retrieval (m3u8)
-* Segment retrieval (ts)
-* Auth flow
-
 ---
 
 ## 📁 Project Structure
 
 ```
 videoflix-backend/
-├── auth_app/          # Registration, login, activation, reset
-├── video_app/         # Video models, views, streaming logic
-├── core/              # Main Django settings + URLs
-├── templates/         # Email templates
-├── media/             # Uploaded and transcoded files
-├── manage.py          # Django CLI entry point
-├── requirements.txt   # Dependencies
-├── settings_test.py   # Pytest test configuration
-└── pytest.ini         # Pytest environment config
+├── auth_app/               # Registration, login, activation & password reset endpoints
+├── video_app/              # Video models, HLS conversion tasks, streaming views & serializers
+├── core/                   # Main Django settings, URL configuration & WSGI/ASGI entrypoints
+├── templates/              # Email templates for activation & password reset
+├── media/                  # Uploaded source videos and generated HLS segments/playlists
+├── backend.Dockerfile      # Dockerfile to build the Django backend image
+├── backend.entrypoint.sh   # Entrypoint script: apply migrations, collect static, start server
+├── docker-compose.yml      # Docker Compose config for web, PostgreSQL, Redis services
+├── manage.py               # Django management CLI entry point
+├── pytest.ini              # pytest configuration (Django settings, env vars)
+└── requirements.txt        # Python dependencies (pinned in Pipfile.lock)
 ```
 
 ---

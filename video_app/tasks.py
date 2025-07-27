@@ -1,22 +1,38 @@
+import os
 import ffmpeg
 
+
 def convert_to_hls(source: str):
-    """
-    Erzeugt aus source.mp4 eine HLS-Playlist source.m3u8
-    mit copy-Codec und 10-Sekunden-Segmenten.
-    """
-    target = source.replace('.mp4', '.m3u8')
-    (
-        ffmpeg
-        .input(source)
-        .output(
-            target,
-            vcodec='copy',        # kein Re-Encoding Video
-            acodec='copy',        # kein Re-Encoding Audio
-            start_number=0,       # erste Segment-Nummer
-            hls_time=10,          # Länge jedes Segments in Sekunden
-            hls_list_size=0,      # alle Segmente in Playlist
-            f='hls'               # Format HLS
+    resolutions = {
+        '480p': '854x480',
+        '720p': '1280x720',
+        '1080p': '1920x1080',
+    }
+
+    base_name = os.path.splitext(os.path.basename(source))[0]
+    output_dir = os.path.join(os.path.dirname(source), base_name + '_hls')
+    os.makedirs(output_dir, exist_ok=True)
+
+    for res, size in resolutions.items():
+        res_dir = os.path.join(output_dir, res)
+        os.makedirs(res_dir, exist_ok=True)
+
+        out_playlist = os.path.join(res_dir, 'index.m3u8')
+        out_segments = os.path.join(res_dir, f'{res}%d.ts')
+
+        (
+            ffmpeg
+            .input(source)
+            .output(
+                out_playlist,
+                vf=f'scale={size}',
+                acodec='aac',
+                vcodec='h264',
+                hls_time=10,
+                hls_list_size=0,
+                start_number=0,
+                f='hls',
+                hls_segment_filename=out_segments
+            )
+            .run(overwrite_output=True)
         )
-        .run(overwrite_output=True)
-    )

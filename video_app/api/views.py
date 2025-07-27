@@ -1,42 +1,50 @@
+# video_app/api/views.py
+
 import os
-from django.conf import settings
 from django.http import FileResponse, Http404
-from rest_framework import generics, permissions
+from video_app.models import Video
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from video_app.models import Video
-from .serializers import VideoSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 
-class VideoListAPIView(generics.ListAPIView):
-    queryset = Video.objects.all().order_by('-created_at')
-    serializer_class = VideoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class VideoListView(APIView):
+    permission_classes = [IsAuthenticated]
 
-class HLSPlaylistAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        videos = Video.objects.all()
+        data = [{
+            "id": v.id,
+            "created_at": v.created_at,
+            "title": v.title,
+            "description": v.description,
+            "thumbnail_url": request.build_absolute_uri(v.thumbnail.url),
+            "category": v.category
+        } for v in videos]
+        return Response(data)
 
-    def get(self, request, movie_id, resolution):
-        try:
-            video = Video.objects.get(pk=movie_id)
-        except Video.DoesNotExist:
-            raise Http404("Video not found")
-        path = video.get_playlist_path(resolution)
-        full_path = os.path.join(settings.MEDIA_ROOT, 'videos', path)
-        if not os.path.exists(full_path):
-            raise Http404("Manifest not found")
-        return FileResponse(open(full_path, 'rb'), content_type='application/vnd.apple.mpegurl')
 
-class HLSSegmentAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def stream_m3u8(request, movie_id, resolution):
+    try:
+        video = Video.objects.get(pk=movie_id)
+        base = os.path.splitext(video.video.path)[0]
+        hls_path = f"{base}_hls/{resolution}/index.m3u8"
+        return FileResponse(open(hls_path, 'rb'), content_type="application/vnd.apple.mpegurl")
+    except (Video.DoesNotExist, FileNotFoundError):
+        raise Http404()
 
-    def get(self, request, movie_id, resolution, segment):
-        try:
-            video = Video.objects.get(pk=movie_id)
-        except Video.DoesNotExist:
-            raise Http404("Video not found")
-        path = video.get_segment_path(resolution, segment)
-        full_path = os.path.join(settings.MEDIA_ROOT, 'videos', path)
-        if not os.path.exists(full_path):
-            raise Http404("Segment not found")
-        return FileResponse(open(full_path, 'rb'), content_type='video/MP2T')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def stream_segment(request, movie_id, resolution, segment):
+    try:
+        video = Video.objects.get(pk=movie_id)
+        base = os.path.splitext(video.video.path)[0]
+        segment_path = f"{base}_hls/{resolution}/{segment}"
+        return FileResponse(open(segment_path, 'rb'), content_type="video/MP2T")
+    except (Video.DoesNotExist, FileNotFoundError):
+        raise Http404()

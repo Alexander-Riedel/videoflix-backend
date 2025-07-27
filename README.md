@@ -70,7 +70,7 @@ Create a `.env` file in the project root, based on `.env.template`:
 cp .env.template .env
 ```
 
-Edit `.env` and fill in your values (e.g. database credentials, EMAIL_HOST, SECRET_KEY, FRONTEND_URL, etc.).
+Edit `.env` and fill in your values (e.g. database credentials, EMAIL_HOST, SECRET_KEY, etc.).
 
 ### 3. Build and start services
 

@@ -1,4 +1,10 @@
-# auth_app/api/utils.py
+"""
+auth_app.api.utils
+~~~~~~~~~~~~~~~~~~
+
+This module provides utility functions for email-based activation and password reset,
+as well as helper functions for JWT token generation using SimpleJWT.
+"""
 
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
@@ -10,67 +16,89 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 def send_activation_email(user, request):
     """
-    Erzeugt einen Aktivierungs-Token und baut den Frontend-Link:
-    FRONTEND_URL/pages/auth/activate.html?uid={uid}&token={token}
+    Sends an account activation email to the user.
+
+    Args:
+        user (User): The user instance to activate.
+        request (HttpRequest): The request context.
+
+    Returns:
+        str: The generated activation token.
     """
     uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
 
-    base = settings.FRONTEND_URL.rstrip('/')
-    activate_url = (
-        f"{base}/pages/auth/activate.html"
+    base_url = settings.FRONTEND_URL.rstrip('/')
+    activation_url = (
+        f"{base_url}/pages/auth/activate.html"
         f"?uid={uidb64}&token={token}"
     )
 
-    subject = 'Aktiviere dein Konto'
+    subject = 'Activate Your Account'
     message = (
-        f"Hallo {user.username},\n\n"
-        f"bitte klicke auf den folgenden Link, um dein Konto zu aktivieren:\n\n"
-        f"{activate_url}\n\n"
-        "Falls du dich nicht registriert hast, ignoriere diese E-Mail."
+        f"Hello {user.username},\n\n"
+        f"Please click the link below to activate your account:\n\n"
+        f"{activation_url}\n\n"
+        f"If you did not register, you can ignore this email."
     )
+
     send_mail(
         subject,
         message,
-        None,               # DEFAULT_FROM_EMAIL
+        None,  # uses DEFAULT_FROM_EMAIL
         [user.email],
         fail_silently=False,
     )
     return token
+
 
 def send_password_reset_email(user, request):
     """
-    Erzeugt einen Reset-Token und baut den Frontend-Link:
-    FRONTEND_URL/pages/auth/confirm_password.html?uid={uid}&token={token}
+    Sends a password reset email to the user.
+
+    Args:
+        user (User): The user requesting a password reset.
+        request (HttpRequest): The request context.
+
+    Returns:
+        str: The generated password reset token.
     """
     uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
 
-    base = settings.FRONTEND_URL.rstrip('/')
+    base_url = settings.FRONTEND_URL.rstrip('/')
     reset_url = (
-        f"{base}/pages/auth/confirm_password.html"
+        f"{base_url}/pages/auth/confirm_password.html"
         f"?uid={uidb64}&token={token}"
     )
 
-    subject = 'Passwort zurücksetzen'
+    subject = 'Reset Your Password'
     message = (
-        f"Hallo {user.username},\n\n"
-        f"um dein Passwort zurückzusetzen, klicke bitte auf den folgenden Link:\n\n"
+        f"Hello {user.username},\n\n"
+        f"To reset your password, please click the link below:\n\n"
         f"{reset_url}\n\n"
-        "Falls du diese Anfrage nicht gestellt hast, ignoriere diese E-Mail."
+        f"If you did not request this, you can ignore this email."
     )
+
     send_mail(
         subject,
         message,
-        None,               # DEFAULT_FROM_EMAIL
+        None,  # uses DEFAULT_FROM_EMAIL
         [user.email],
         fail_silently=False,
     )
     return token
 
+
 def get_tokens_for_user(user):
     """
-    Erstellt ein Refresh- und ein Access-Token für den übergebenen User.
+    Generates refresh and access tokens for the authenticated user.
+
+    Args:
+        user (User): The user instance.
+
+    Returns:
+        dict: A dictionary with 'refresh' and 'access' token strings.
     """
     refresh = RefreshToken.for_user(user)
     return {

@@ -1,30 +1,31 @@
+"""
+auth_app.api.urls
+~~~~~~~~~~~~~~~~~
+
+Defines URL patterns for authentication-related API endpoints:
+registration, activation, login, logout, token refresh,
+password reset, and password confirmation.
+"""
+
 from django.urls import path
 from .views import (
-    RegisterView, ActivateView, LoginView,
-    LogoutView, CookieTokenRefreshView,
-    PasswordResetView, PasswordConfirmView
+    RegisterView,
+    ActivateView,
+    LoginView,
+    LogoutView,
+    CookieTokenRefreshView,
+    PasswordResetView,
+    PasswordConfirmView,
 )
 
 app_name = 'auth_app'
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
-    path(
-        'activate/<uidb64>/<token>/',
-        ActivateView.as_view(),
-        name='activate'
-    ),
+    path('activate/<uidb64>/<token>/', ActivateView.as_view(), name='activate'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path(
-        'token/refresh/',
-        CookieTokenRefreshView.as_view(),
-        name='token_refresh'
-    ),
+    path('token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('password_reset/', PasswordResetView.as_view(), name='password_reset'),
-    path(
-        'password_confirm/<uidb64>/<token>/',
-        PasswordConfirmView.as_view(),
-        name='password_confirm'
-    ),
+    path('password_confirm/<uidb64>/<token>/', PasswordConfirmView.as_view(), name='password_confirm'),
 ]

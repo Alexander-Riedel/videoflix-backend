@@ -1,8 +1,29 @@
+"""
+video_app.tasks
+~~~~~~~~~~~~~~~
+
+This module provides background tasks related to video processing.
+
+The main task converts uploaded MP4 videos into segmented HLS format
+(HTTP Live Streaming) in multiple resolutions using ffmpeg.
+"""
+
 import os
 import ffmpeg
 
 
 def convert_to_hls(source: str):
+    """
+    Converts an uploaded MP4 video into HLS format with multiple resolutions.
+
+    Args:
+        source (str): The full path to the source MP4 video file.
+
+    Output:
+        Creates directories for 480p, 720p, and 1080p containing:
+        - index.m3u8 manifest
+        - .ts segments for each resolution
+    """
     resolutions = {
         '480p': '854x480',
         '720p': '1280x720',

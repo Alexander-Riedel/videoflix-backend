@@ -1,3 +1,10 @@
+"""
+video_app.api.urls
+~~~~~~~~~~~~~~~~~~
+
+Defines API routes for listing videos and streaming HLS content (playlists and segments).
+"""
+
 from django.urls import path
 from .views import VideoListView, stream_m3u8, stream_segment
 

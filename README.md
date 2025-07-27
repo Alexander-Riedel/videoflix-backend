@@ -62,7 +62,13 @@ git clone https://github.com/Alexander-Riedel/videoflix-backend.git
 cd videoflix-backend
 ```
 
-### 2. Copy and configure environment variables
+### 2. Change the line sequence
+
+From file `backend.entrypoint.sh`  change the line sequence to LF.
+
+How to change in VSC: [Google](https://www.google.com/search?sca_esv=81208bf63503b115&rlz=1C1CHBF_deDE1069DE1069&q=cr+lf+lf+in+vscode&spell=1&sa=X&ved=2ahUKEwihofbto4eNAxXK9bsIHXhtCLYQBSgAegQIDxAB&biw=1920&bih=911&dpr=1)
+
+### 3. Copy and configure environment variables
 
 Create a `.env` file in the project root, based on `.env.template`:
 
@@ -72,7 +78,7 @@ cp .env.template .env
 
 Edit `.env` and fill in your values (e.g. database credentials, EMAIL_HOST, SECRET_KEY, etc.).
 
-### 3. Build and start services
+### 4. Build and start services
 
 ```bash
 docker-compose up --build
@@ -85,7 +91,7 @@ This will:
 3. Start the **db** (PostgreSQL) service  
 4. Start the **redis** service for caching and RQ  
 
-### 4. Access the application
+### 5. Access the application
 
 - **Admin**: http://localhost:8000/admin/  
 

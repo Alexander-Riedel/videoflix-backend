@@ -209,3 +209,8 @@ EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 
 EMAIL_BACKEND = "auth_app.api.email_backend.UnverifiedTLSBackend"
+
+
+# Frontend settings
+
+FRONTEND_URL = 'http://127.0.0.1:5500'

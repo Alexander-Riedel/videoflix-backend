@@ -13,6 +13,7 @@ from .serializers import (
     PasswordResetSerializer, SetNewPasswordSerializer
 )
 from .utils import send_activation_email
+from .utils import send_password_reset_email
 
 # 1. Registrierung
 class RegisterView(generics.CreateAPIView):
@@ -141,8 +142,8 @@ class PasswordResetView(APIView):
         serializer.is_valid(raise_exception=True)
         try:
             user = User.objects.get(email=serializer.validated_data['email'])
-            # Wir nutzen denselben Mechanismus wie bei der Aktivierung
-            send_activation_email(user, request)
+            # Wir versenden jetzt einen expliziten Password-Reset-Link
+            send_password_reset_email(user, request)
         except User.DoesNotExist:
             pass  # Sicherheitsmaßnahme: keine Information darüber, ob die E-Mail existiert
 

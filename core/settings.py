@@ -14,6 +14,7 @@ from pathlib import Path
 
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -99,7 +100,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+
+    # Cookie-spezifische Einstellungen (werden nicht automatisch verwendet, nur zur Doku)
+    'AUTH_COOKIE': 'access_token',
+    'AUTH_COOKIE_REFRESH': 'refresh_token',
+    'AUTH_COOKIE_SECURE': True,
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_SAMESITE': 'None',
+    'AUTH_COOKIE_PATH': '/',
 }
 
 
@@ -191,6 +203,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # DRF settings
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'auth_app.api.authentication.CookieJWTAuthentication',
+    ),
     # Standard-Renderer: HTML + JSON
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',

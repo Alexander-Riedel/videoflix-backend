@@ -103,8 +103,8 @@ class LoginView(APIView):
                 'username': user.username
             }
         }, status=200)
-        response.set_cookie('access_token', str(refresh.access_token), httponly=True)
-        response.set_cookie('refresh_token', str(refresh), httponly=True)
+        response.set_cookie('access_token', value=str(refresh.access_token), httponly=True, secure=True, samesite='None', path='/')
+        response.set_cookie('refresh_token', value=str(refresh), httponly=True, secure=True, samesite='None', path='/')
         return response
 
 
@@ -125,8 +125,8 @@ class LogoutView(APIView):
         response = Response({
             'detail': 'Log-Out successfully! All Tokens will be deleted. Refresh token is now invalid.'
         }, status=200)
-        response.delete_cookie('access_token')
-        response.delete_cookie('refresh_token')
+        response.delete_cookie('access_token', path='/', samesite='None')
+        response.delete_cookie('refresh_token', path='/', samesite='None')
         return response
 
 
@@ -155,12 +155,13 @@ class CookieTokenRefreshView(TokenRefreshView):
 
         if access_token:
             response.set_cookie(
-                key='access_token',
-                value=access_token,
-                httponly=True,
-                secure=False,
-                samesite='Lax'
-            )
+            key='access_token',
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite='None',
+            path='/'
+        )
 
         return response
 
